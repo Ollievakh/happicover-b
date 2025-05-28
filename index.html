@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Insurance Flow</title>
+    <title>Insurance Flow A-B Test</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.cdnfonts.com/css/nexa" rel="stylesheet">
@@ -86,6 +86,64 @@
             padding-top: 0 !important;
             padding-bottom: 0 !important;
         }
+
+        /* Mobile menu styles */
+        .mobile-menu-button {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-button {
+                display: block;
+            }
+            .desktop-menu {
+                display: none !important;
+            }
+        }
+
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                padding-left: 7.5rem;
+                padding-right: 7.5rem;
+            }
+        }
+
+        .plan-radio:checked + .plan-label .plan-card {
+            border: 2px solid #4969AF;
+        }
+        .plan-radio:checked + .plan-label .radio-dot {
+            display: block;
+        }
+        .plan-label:hover .plan-card {
+            border-color: #4969AF;
+        }
+        .plan-card {
+            border: 2px solid #EEF5FD;
+            transition: all 0.3s ease;
+        }
     </style>
     <script>
         tailwind.config = {
@@ -118,12 +176,14 @@
 
     <!-- Header -->
     <header class="bg-bg-white w-full">
-        <div class="container mx-auto px-[88px] py-4">
+        <div class="container mx-auto px-4 md:px-[88px] py-4">
             <div class="flex justify-between items-center w-full">
                 <div class="flex items-center">
                     <img src="assets/dark_logo.svg" alt="Happipad Logo" class="h-10 w-auto">
                 </div>
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center">
+                    <!-- Desktop Menu -->
+                    <div class="desktop-menu hidden md:flex items-center space-x-4">
                     <button class="header-button">
                         <img src="assets/Support.svg" alt="Support" class="w-6 h-6 mr-2">
                         <span>Help 24/7</span>
@@ -131,47 +191,105 @@
                     <button class="header-button">
                         <img src="assets/user.svg" alt="User" class="w-6 h-6 mr-2">
                         <span>Sign in</span>
+                        </button>
+                    </div>
+                    <!-- Mobile Menu Button -->
+                    <button class="mobile-menu-button p-2" onclick="toggleMobileMenu()">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="container mx-auto px-[120px] pt-2 pb-8">
+    <!-- Mobile Menu Popup -->
+    <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-50 p-6">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="text-lg font-semibold">Menu</h3>
+            <button onclick="toggleMobileMenu()" class="p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <button class="w-full flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors">
+                <img src="assets/Support.svg" alt="Support" class="w-6 h-6 mr-3">
+                <span>Help 24/7</span>
+            </button>
+            <button class="w-full flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors">
+                <img src="assets/user.svg" alt="User" class="w-6 h-6 mr-3">
+                <span>Sign in</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobileMenuOverlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40" onclick="toggleMobileMenu()"></div>
+
+    <main class="container mx-auto px-4 md:px-8 lg:px-[120px] pt-3 pb-8 w-full">
         <!-- Main Content -->
-        <div class="space-y-2 mb-6">
+        <div class="space-y-3 mb-3 w-full">
             <!-- Progress Card -->
-            <div class="bg-bg-white rounded-lg border border-[#EEF5FD] p-6 max-w-[800px] mx-auto">
+            <div class="bg-bg-white rounded-[16px] border border-[#EEF5FD] p-4 sm:p-4 md:p-6 w-full max-w-[1200px] mx-auto">
                 <h3 class="text-lg font-semibold mb-4">Progress</h3>
                 <div class="w-full bg-[#BDC9DB] rounded-full h-2">
                     <div id="progressBar" class="bg-theme-secondary h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
-                <p class="text-sm text-text-secondary-2 mt-2 font-normal">Step 1 of 6</p>
+                <p class="text-sm text-text-secondary-2 mt-2 font-semibold" id="stepCounter">Step 1 of 3</p>
             </div>
 
             <!-- Question Card -->
-            <div class="bg-bg-white rounded-lg border border-[#EEF5FD] p-6 max-w-[800px] mx-auto">
+            <div class="bg-bg-white rounded-[16px] border border-[#EEF5FD] p-4 sm:p-4 md:p-6 w-full max-w-[1200px] mx-auto">
                 <div id="step1" class="step-content">
-                    <h3 class="text-3xl text-text-1 mb-2">What's your address?</h3>
-                    <p class="text-text-secondary-2 mb-[72px] font-normal">Please provide your current address.</p>
+                    <h3 class="text-3xl text-text-1 mb-2">Property and Personal Information</h3>
+                    <p class="text-text-secondary-2 mb-[72px] font-semibold">Please provide the address of the property you want to insure and your personal information.</p>
                     <div class="space-y-4 mb-[72px]">
                         <div>
                             <label class="block text-sm text-text-secondary-2 mb-1">Street Address</label>
-                            <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[8px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                            <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[6px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm text-text-secondary-2 mb-1">City</label>
-                                <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[8px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                                <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[6px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
                             </div>
                             <div>
                                 <label class="block text-sm text-text-secondary-2 mb-1">State/Province</label>
-                                <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[8px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                                <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[6px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
                             </div>
                         </div>
                         <div>
                             <label class="block text-sm text-text-secondary-2 mb-1">ZIP Code/Postal Code</label>
-                            <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[8px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                            <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[6px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-text-secondary-2 mb-1">Start Date</label>
+                            <input type="date" class="w-full border-[0.5px] border-[#6D6F79] rounded-[6px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm text-text-secondary-2 mb-1">First Name</label>
+                                <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[6px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-text-secondary-2 mb-1">Last Name</label>
+                                <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[6px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm text-text-secondary-2 mb-1">Date of Birth</label>
+                            <input type="date" class="w-full border-[0.5px] border-[#6D6F79] rounded-[6px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-text-secondary-2 mb-1">Email</label>
+                            <input type="email" class="w-full border-[0.5px] border-[#6D6F79] rounded-[6px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-text-secondary-2 mb-1">Phone Number</label>
+                            <input type="tel" class="w-full border-[0.5px] border-[#6D6F79] rounded-[6px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
                         </div>
                     </div>
                     <div>
@@ -182,16 +300,89 @@
                 </div>
 
                 <div id="step2" class="step-content hidden">
-                    <h3 class="text-3xl text-text-1 mb-2">What's your insurance start date?</h3>
-                    <p class="text-text-secondary-2 mb-[72px] font-normal">Choose when you'd like your coverage to begin.</p>
+                    <h3 class="text-3xl text-text-1 mb-2">Choose your plan</h3>
+                    <p class="text-text-secondary-2 mb-[72px] font-semibold">Select the payment plan that works best for you.</p>
                     <div class="space-y-4 mb-[72px]">
-                        <div>
-                            <label class="block text-sm text-text-secondary-2 mb-1">Start Date</label>
-                            <input type="date" class="w-full border-[0.5px] border-[#6D6F79] rounded-[8px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="plan-option">
+                                <input type="radio" id="monthly-plan" name="plan" class="plan-radio hidden" value="monthly">
+                                <label for="monthly-plan" class="plan-label block cursor-pointer">
+                                    <div class="plan-card h-full p-6 border border-[#EEF5FD] rounded-[16px] bg-[#F5F7FC]">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div>
+                                                <h4 class="text-lg font-semibold text-text-1">Monthly</h4>
+                                                <p class="text-sm text-text-secondary-2 font-semibold">Pay monthly</p>
+                                            </div>
+                                            <div class="radio-circle w-5 h-5 border-2 border-[#4969AF] rounded-full flex items-center justify-center">
+                                                <div class="radio-dot w-3 h-3 bg-[#4969AF] rounded-full hidden"></div>
+                                            </div>
+                                        </div>
+                                        <p class="text-2xl font-semibold text-text-1 mb-6">$22<span class="text-base font-semibold text-text-secondary-2">/month</span></p>
+                                        <div class="space-y-3">
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-[#4969AF] mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <p class="text-text-secondary-2 font-semibold">Bodily Injury up to $1,000,000</p>
+                                            </div>
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-[#4969AF] mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <p class="text-text-secondary-2 font-semibold">Property Damage up to $100,000</p>
+                                            </div>
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-[#4969AF] mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <p class="text-text-secondary-2 font-semibold">Medical Payments up to $10,000</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="plan-option">
+                                <input type="radio" id="yearly-plan" name="plan" class="plan-radio hidden" value="yearly" checked>
+                                <label for="yearly-plan" class="plan-label block cursor-pointer">
+                                    <div class="plan-card h-full p-6 border border-[#EEF5FD] rounded-[16px] bg-[#F5F7FC]">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div>
+                                                <h4 class="text-lg font-semibold text-text-1">Yearly</h4>
+                                                <p class="text-sm text-text-secondary-2 font-semibold">One yearly payment</p>
+                                            </div>
+                                            <div class="radio-circle w-5 h-5 border-2 border-[#4969AF] rounded-full flex items-center justify-center">
+                                                <div class="radio-dot w-3 h-3 bg-[#4969AF] rounded-full hidden"></div>
+                                            </div>
+                                        </div>
+                                        <p class="text-2xl font-semibold text-text-1 mb-6">$240<span class="text-base font-semibold text-text-secondary-2">/year</span></p>
+                                        <p class="text-sm text-[#4969AF] font-semibold mb-6">Save 9%</p>
+                                        <div class="space-y-3">
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-[#4969AF] mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <p class="text-text-secondary-2 font-semibold">Bodily Injury up to $1,000,000</p>
+                                            </div>
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-[#4969AF] mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <p class="text-text-secondary-2 font-semibold">Property Damage up to $100,000</p>
+                                            </div>
+                                            <div class="flex items-start">
+                                                <svg class="w-5 h-5 text-[#4969AF] mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <p class="text-text-secondary-2 font-semibold">Medical Payments up to $10,000</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div class="flex gap-4">
-                        <button type="button" onclick="showStep(1)" class="w-[100px] shrink-0 border-2 border-theme-secondary/50 text-theme-secondary pt-4 pb-[11px] px-8 rounded-999 hover:bg-theme-secondary hover:text-white transition-colors">
+                        <button type="button" onclick="showStep(1)" class="w-[100px] shrink-0 border border-theme-secondary/50 text-theme-secondary pt-4 pb-[11px] px-8 rounded-999 hover:bg-[#F5F7FC] hover:text-theme-secondary transition-colors">
                             Back
                         </button>
                         <button type="button" onclick="showStep(3)" class="flex-1 bg-theme-secondary text-white pt-4 pb-[11px] px-8 rounded-999 hover:bg-primary-blue transition-colors">
@@ -201,100 +392,53 @@
                 </div>
 
                 <div id="step3" class="step-content hidden">
-                    <h3 class="text-3xl text-text-1 mb-2">Tell us about yourself</h3>
-                    <p class="text-text-secondary-2 mb-[72px] font-normal">Please provide your personal information.</p>
-                    <div class="space-y-4 mb-[72px]">
-                        <div class="grid grid-cols-2 gap-4">
+                    <h3 class="text-3xl text-text-1 mb-8">Payment</h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-[72px]">
+                        <!-- Plan Details -->
+                        <div class="lg:col-span-3">
                             <div>
-                                <label class="block text-sm text-text-secondary-2 mb-1">First Name</label>
-                                <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[8px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
-                            </div>
-                            <div>
-                                <label class="block text-sm text-text-secondary-2 mb-1">Last Name</label>
-                                <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[8px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h4 class="text-lg font-semibold text-text-1">Happicover</h4>
+                                        <p class="text-text-secondary-2 font-semibold" id="plan-type">Yearly Payment</p>
+                                    </div>
+                                    <p class="text-2xl font-semibold text-text-1" id="plan-price">$240<span class="text-base font-semibold text-text-secondary-2">/year</span></p>
+                                </div>
+                                <p class="text-sm text-text-secondary-2 font-semibold mt-4">Your plan will be auto-renewed until canceled. Cancel any time. <a href="#" class="text-[#4969AF] hover:underline">Read more about cancellations</a></p>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-sm text-text-secondary-2 mb-1">Date of Birth</label>
-                            <input type="date" class="w-full border-[0.5px] border-[#6D6F79] rounded-[8px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
-                        </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <button type="button" onclick="showStep(2)" class="w-[100px] shrink-0 border-2 border-theme-secondary/50 text-theme-secondary pt-4 pb-[11px] px-8 rounded-999 hover:bg-theme-secondary hover:text-white transition-colors">
-                            Back
-                        </button>
-                        <button type="button" onclick="showStep(4)" class="flex-1 bg-theme-secondary text-white pt-4 pb-[11px] px-8 rounded-999 hover:bg-primary-blue transition-colors">
-                            Continue
-                        </button>
-                    </div>
-                </div>
 
-                <div id="step4" class="step-content hidden">
-                    <h3 class="text-3xl text-text-1 mb-2">How can we reach you?</h3>
-                    <p class="text-text-secondary-2 mb-[72px] font-normal">Please provide your contact information.</p>
-                    <div class="space-y-4 mb-[72px]">
-                        <div>
-                            <label class="block text-sm text-text-secondary-2 mb-1">Email</label>
-                            <input type="email" class="w-full border-[0.5px] border-[#6D6F79] rounded-[8px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
-                        </div>
-                        <div>
-                            <label class="block text-sm text-text-secondary-2 mb-1">Phone Number</label>
-                            <input type="tel" class="w-full border-[0.5px] border-[#6D6F79] rounded-[8px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300">
+                        <!-- Payment Summary -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-[#F5F7FC] rounded-[16px] border border-[#EEF5FD] p-6">
+                                <h4 class="text-lg font-semibold text-text-1 mb-4">Summary</h4>
+                                <div class="space-y-3 mb-6">
+                                    <div class="flex justify-between">
+                                        <p class="text-text-secondary-2 font-semibold">Subtotal</p>
+                                        <p class="text-text-1 font-semibold" id="subtotal">$22.00</p>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <p class="text-text-secondary-2 font-semibold">Tax</p>
+                                        <p class="text-text-1 font-semibold">$5.00</p>
+                                    </div>
+                                    <div class="border-t border-[#EEF5FD] pt-3">
+                                        <div class="flex justify-between">
+                                            <p class="text-text-1 font-semibold">Total</p>
+                                            <p class="text-text-1 font-semibold" id="total">$27.00</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button onclick="showPaymentPopup()" class="w-full bg-theme-secondary text-white pt-4 pb-[11px] px-8 rounded-999 hover:bg-primary-blue transition-colors">
+                                    Pay Now
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="flex gap-4">
-                        <button type="button" onclick="showStep(3)" class="w-[100px] shrink-0 border-2 border-theme-secondary/50 text-theme-secondary pt-4 pb-[11px] px-8 rounded-999 hover:bg-theme-secondary hover:text-white transition-colors">
-                            Back
-                        </button>
-                        <button type="button" onclick="showStep(5)" class="flex-1 bg-theme-secondary text-white pt-4 pb-[11px] px-8 rounded-999 hover:bg-primary-blue transition-colors">
-                            Continue
-                        </button>
-                    </div>
-                </div>
 
-                <div id="step5" class="step-content hidden">
-                    <h3 class="text-lg font-semibold mb-4">Choose your plan</h3>
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="border border-gray-300 rounded-lg p-4 cursor-pointer hover:border-blue-500 transition-all">
-                                <h4 class="font-semibold">Monthly</h4>
-                                <p class="text-gray-600">$29.99/month</p>
-                            </div>
-                            <div class="border border-gray-300 rounded-lg p-4 cursor-pointer hover:border-blue-500 transition-all">
-                                <h4 class="font-semibold">Yearly</h4>
-                                <p class="text-gray-600">$299.99/year</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-4 mt-[72px]">
-                            <button type="button" onclick="showStep(3)" class="w-[100px] shrink-0 border-2 border-theme-secondary text-theme-secondary pt-4 pb-[11px] px-8 rounded-999 hover:bg-theme-secondary hover:text-white transition-colors">
-                                Back
-                            </button>
-                            <button type="button" onclick="showStep(5)" class="flex-1 bg-theme-secondary text-white pt-4 pb-[11px] px-8 rounded-999 hover:bg-primary-blue transition-colors">
-                                Continue
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="step6" class="step-content hidden">
-                    <h3 class="text-lg font-semibold mb-4">Payment Information</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-                            <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-[8px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
-                                <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-[8px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                                <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-[8px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
-                            </div>
-                        </div>
-                        <button onclick="showStep(7)" class="w-full bg-theme-secondary text-white pt-4 pb-[11px] px-8 rounded-999 hover:bg-primary-blue transition-colors">
-                            Complete Payment
+                    <div class="flex justify-start">
+                        <button type="button" onclick="showStep(2)" class="text-theme-secondary font-semibold hover:text-primary-blue hover:bg-[#F5F7FC] px-4 py-2 rounded-lg transition-colors">
+                            ← Back to plan selection
                         </button>
                     </div>
                 </div>
@@ -302,7 +446,7 @@
         </div>
 
         <!-- FAQ Section -->
-        <div class="bg-bg-white rounded-lg border border-[#EEF5FD] p-6 max-w-[800px] mx-auto">
+        <div id="faqSection" class="bg-bg-white rounded-[16px] border border-[#EEF5FD] p-4 sm:p-4 md:p-6 w-full max-w-[1200px] mx-auto">
             <h3 class="text-lg font-semibold mb-4">Frequently Asked Questions</h3>
             <div class="space-y-4">
                 <div class="border-b border-[#EEF5FD] pb-4">
@@ -313,19 +457,19 @@
                         </svg>
                     </button>
                     <div class="mt-2 hidden space-y-4">
-                        <p class="text-base text-[#3C3F4C] opacity-60 font-normal">Renters insurance is a type of insurance policy that provides coverage for your personal belongings and liability protection when you're renting a home or apartment.</p>
+                        <p class="text-base text-[#3C3F4C] opacity-60 font-semibold">Renters insurance is a type of insurance policy that provides coverage for your personal belongings and liability protection when you're renting a home or apartment.</p>
                         <div class="space-y-2">
                             <div class="flex justify-between">
-                                <span class="text-base text-[#3C3F4C] opacity-60 font-normal">Bodily Injury</span>
-                                <span class="text-base text-[#3C3F4C] opacity-60 font-normal">Up to $1M/event</span>
+                                <span class="text-base text-[#3C3F4C] opacity-60 font-semibold">Bodily Injury</span>
+                                <span class="text-base text-[#3C3F4C] opacity-60 font-semibold">Up to $1M/event</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-base text-[#3C3F4C] opacity-60 font-normal">Property Damage</span>
-                                <span class="text-base text-[#3C3F4C] opacity-60 font-normal">Up to $100K/event</span>
+                                <span class="text-base text-[#3C3F4C] opacity-60 font-semibold">Property Damage</span>
+                                <span class="text-base text-[#3C3F4C] opacity-60 font-semibold">Up to $100K/event</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-base text-[#3C3F4C] opacity-60 font-normal">Medical Payments</span>
-                                <span class="text-base text-[#3C3F4C] opacity-60 font-normal">Up to $10K/event</span>
+                                <span class="text-base text-[#3C3F4C] opacity-60 font-semibold">Medical Payments</span>
+                                <span class="text-base text-[#3C3F4C] opacity-60 font-semibold">Up to $10K/event</span>
                             </div>
                         </div>
                     </div>
@@ -338,26 +482,68 @@
                         </svg>
                     </button>
                     <div class="mt-2 text-text-secondary-2 hidden space-y-2">
-                        <p class="text-base text-[#3C3F4C] opacity-60 font-normal">No deductible for Bodily Injury Liability, Property Damage Liability, and Medical Payments to Others — you're fully covered from the first dollar.</p>
-                        <p class="text-base text-[#3C3F4C] opacity-60 font-normal">$500 deductible applies to Limited Personal Property coverage (your belongings).</p>
-                        <p class="text-base text-[#3C3F4C] opacity-60 font-normal">$100 deductible applies to Pet Damage coverage.</p>
-                        <p class="text-base text-[#3C3F4C] opacity-60 font-normal">No deductible for Animal Liability and Biohazard Clean-Up endorsements.</p>
+                        <p class="text-base text-[#3C3F4C] opacity-60 font-semibold">No deductible for Bodily Injury Liability, Property Damage Liability, and Medical Payments to Others — you're fully covered from the first dollar.</p>
+                        <p class="text-base text-[#3C3F4C] opacity-60 font-semibold">$500 deductible applies to Limited Personal Property coverage (your belongings).</p>
+                        <p class="text-base text-[#3C3F4C] opacity-60 font-semibold">$100 deductible applies to Pet Damage coverage.</p>
+                        <p class="text-base text-[#3C3F4C] opacity-60 font-semibold">No deductible for Animal Liability and Biohazard Clean-Up endorsements.</p>
                     </div>
                 </div>
             </div>
         </div>
-    </main>
 
-    <!-- Confirmation Popup -->
-    <div id="confirmationPopup" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-bg-white rounded-lg p-6 max-w-md w-full mx-4 border border-[#EEF5FD]">
-            <h3 class="text-xl font-sora mb-4">Thank You!</h3>
-            <p class="text-text-secondary-2 mb-6">Your insurance has been successfully set up. We'll send you a confirmation email shortly.</p>
-            <button onclick="closeConfirmation()" class="w-full bg-theme-secondary text-white py-3 rounded-999 hover:bg-primary-blue transition-colors">
-                Close
-            </button>
+        <!-- Payment Popup -->
+        <div id="paymentPopup" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50" onclick="closePaymentPopup()">
+            <div class="bg-bg-white rounded-[16px] p-6 max-w-lg w-full mx-4 border border-[#EEF5FD]" onclick="event.stopPropagation()">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-sora">Payment Information</h3>
+                    <button onclick="closePaymentPopup()" class="text-text-secondary-2 hover:text-text-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <p class="text-red-500 mb-4">Test, input any information.</p>
+                <form id="paymentForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-text-secondary-2 mb-1">Card Number</label>
+                        <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[4px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300" placeholder="1234 5678 9012 3456">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm text-text-secondary-2 mb-1">Expiry Date</label>
+                            <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[4px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300" placeholder="MM/YY">
+                        </div>
+                        <div>
+                            <label class="block text-sm text-text-secondary-2 mb-1">CVV</label>
+                            <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[4px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300" placeholder="123">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm text-text-secondary-2 mb-1">Name on Card</label>
+                        <input type="text" class="w-full border-[0.5px] border-[#6D6F79] rounded-[4px] px-4 py-2 text-text-1 focus:ring-2 focus:ring-theme-secondary focus:border-theme-secondary transition-all duration-300" placeholder="John Doe">
+                    </div>
+                    <button type="submit" class="w-full bg-theme-secondary text-white pt-4 pb-[11px] px-8 rounded-999 hover:bg-primary-blue transition-colors">
+                        Complete Payment
+                    </button>
+                </form>
+            </div>
         </div>
-    </div>
+
+        <!-- Confirmation Popup -->
+        <div id="confirmationPopup" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50" onclick="closeConfirmation()">
+            <div class="bg-bg-white rounded-[16px] p-6 max-w-lg w-full mx-4 border border-[#EEF5FD]" onclick="event.stopPropagation()">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-sora">Confirmation</h3>
+                    <button onclick="closeConfirmation()" class="text-text-secondary-2 hover:text-text-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <p class="text-text-secondary-2 mb-6">Thank you for your purchase! Your order has been confirmed.</p>
+            </div>
+        </div>
+    </main>
 
     <script>
         // Initialize the flow
@@ -384,7 +570,7 @@
             }
             
             // Update progress bar
-            const totalSteps = 6; // Total number of steps
+            const totalSteps = 3; // Total number of steps
             const progress = ((stepNumber - 1) / (totalSteps - 1)) * 100;
             const progressBar = document.getElementById('progressBar');
             if (progressBar) {
@@ -392,9 +578,15 @@
             }
             
             // Update step counter
-            const stepCounter = document.querySelector('.step-counter');
+            const stepCounter = document.getElementById('stepCounter');
             if (stepCounter) {
                 stepCounter.textContent = `Step ${stepNumber} of ${totalSteps}`;
+            }
+
+            // Show/hide FAQ section based on current step
+            const faqSection = document.getElementById('faqSection');
+            if (faqSection) {
+                faqSection.style.display = stepNumber === 3 ? 'none' : 'block';
             }
         }
 
@@ -422,6 +614,91 @@
                 content.classList.add('hidden');
                 arrow.classList.remove('rotate-180');
             }
+        }
+
+        // Mobile menu functionality
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            menu.classList.toggle('active');
+            overlay.classList.toggle('hidden');
+            
+            // Prevent body scroll when menu is open
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : '';
+        }
+
+        // Close mobile menu on window resize if open
+        window.addEventListener('resize', () => {
+            const menu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            
+            if (window.innerWidth > 768 && menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                overlay.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Add this to your existing script
+        document.addEventListener('DOMContentLoaded', function() {
+            const planRadios = document.querySelectorAll('input[name="plan"]');
+            const planType = document.getElementById('plan-type');
+            const planPrice = document.getElementById('plan-price');
+            const subtotal = document.getElementById('subtotal');
+            const total = document.getElementById('total');
+
+            planRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'monthly') {
+                        planType.textContent = 'Monthly Payment';
+                        planPrice.innerHTML = '$22<span class="text-base font-semibold text-text-secondary-2">/month</span>';
+                        subtotal.textContent = '$22.00';
+                        total.textContent = '$27.00';
+                    } else {
+                        planType.textContent = 'Yearly Payment';
+                        planPrice.innerHTML = '$240<span class="text-base font-semibold text-text-secondary-2">/year</span>';
+                        subtotal.textContent = '$240.00';
+                        total.textContent = '$245.00';
+                    }
+                });
+            });
+        });
+
+        // Add these functions to your existing script
+        function showPaymentPopup() {
+            const popup = document.getElementById('paymentPopup');
+            popup.classList.remove('hidden');
+            popup.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePaymentPopup() {
+            const popup = document.getElementById('paymentPopup');
+            popup.classList.add('hidden');
+            popup.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+
+        // Add event listener for payment form submission
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            closePaymentPopup();
+            showConfirmation();
+        });
+
+        // Function to show the confirmation popup
+        function showConfirmation() {
+            const popup = document.getElementById('confirmationPopup');
+            popup.classList.remove('hidden');
+            popup.classList.add('flex');
+        }
+
+        // Function to close the confirmation popup
+        function closeConfirmation() {
+            const popup = document.getElementById('confirmationPopup');
+            popup.classList.add('hidden');
+            popup.classList.remove('flex');
         }
     </script>
 </body>
